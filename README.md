@@ -1,5 +1,5 @@
 
-# Accountsy Bill - MERN Stack Invoicing Application
+# Accountsy Bill - MERN Stack Invoicing Web Application
 Built with the MERN stack (MongoDB, Express, React and NodeJS).
 
 ----
