@@ -33,12 +33,11 @@ export default function Uploader({ form, setForm }) {
     const url = process.env.REACT_APP_CLOUDINARY_URL;
 
     acceptedFiles.forEach(async (acceptedFile) => {
-      //   const { signature, timestamp } = await getSignature();
 
       const formData = new FormData();
       formData.append("file", acceptedFile);
-      formData.append("upload_preset","accountsyLogo");
-      formData.append("cloud_name" , "dzm13rwwt")
+      formData.append("upload_preset", "accountsyLogo");
+      formData.append("cloud_name", "dzm13rwwt")
 
       const response = await fetch(url, {
         method: "POST",
@@ -46,9 +45,8 @@ export default function Uploader({ form, setForm }) {
       });
       setProgress(100)
       const data = await response.json();
-      // console.log(data)                   
       setFile(data.secure_url)
-      // console.log(data.secure_url)
+
     });
   }, []);
 

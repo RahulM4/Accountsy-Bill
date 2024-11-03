@@ -14,7 +14,7 @@ const Footer = () => {
     return (
         <footer>
             <div className={styles.footerText}>
-            © Rahul Mahto  | Made with ❤️ |  <span><a style={{textDecoration: 'none'}} href="https://github.com/RahumM4" target="_blank" rel="noopener noreferrer">github</a></span>
+            ©Rahul Mahto  | Made with ❤️ <span><a href="https://github.com/RahulM4" target="_blank" rel="noopener noreferrer">Github</a></span>
             </div>
             {user && (
             <FabButton />

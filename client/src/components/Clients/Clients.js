@@ -25,6 +25,7 @@ import { Button } from '@material-ui/core';
 import { useSnackbar } from 'react-simple-snackbar'
 
 import { deleteClient } from '../../actions/clientActions';
+// import clients from '../../clients.json'
 
 const useStyles1 = makeStyles((theme) => ({
   root: {

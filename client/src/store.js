@@ -1,4 +1,8 @@
 
+//store
+//array of booorowers
+
+
 const store = [
     {name: 'gps', quantity: 500, type: 'gps'},
     {name: 'mistnet', quantity: 500, type: 'misnet'},
@@ -13,10 +17,10 @@ const status =['pending', 'delivered', 'returned']
 
 
 const lenders = [
-    { name: 'Munna Bhai', type: 'mistnest', quantity: 20, date: new Date(), status: 'pending', dateDue: ''},
+    { name: 'Rahul Mahto', type: 'mistnest', quantity: 20, date: new Date(), status: 'pending', dateDue: ''},
     { name: 'Iniunam Iniunam', type: 'gps', quantity: 20, date: new Date(), status: 'pending', dateDue: ''},
     { name: 'Bello Adamu', type: 'camera', quantity: 20, date: new Date(), status: 'pending', dateDue: ''},
-    { name: 'Munna Bhai', type: 'trap', quantity: 20, date: new Date(), status: 'pending', dateDue: ''},
+    { name: 'Rahul Mahto', type: 'trap', quantity: 20, date: new Date(), status: 'pending', dateDue: ''},
     { name: 'Bello Adamu', type: 'gps', quantity: 20, date: new Date(), status: 'pending', dateDue: ''},
 ]
 

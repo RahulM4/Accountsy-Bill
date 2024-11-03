@@ -1,21 +1,7 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400..800;1,400..800&display=swap');  
-
-
-:root{
-  --blue-theme-main-color: #022D4D;       
-  --blue-theme-background-color: #535c9154;  
-  --blue-theme-sub-text-color: #8e8e8e;    
-  --blue-theme-nav-background-color: #f39d1292;
-  --blue-theme-hover-color: #e67e22;
-  --blue-theme-progress-bar: #F7C265;
-
-}
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  font-family: Verdana, sans-serif;
 
 
 }

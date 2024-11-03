@@ -3,6 +3,7 @@ import { useHistory, useLocation } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import decode from 'jwt-decode'
 import styles from './Header.module.css'
+
 import Button from '@material-ui/core/Button';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Grow from '@material-ui/core/Grow';
@@ -12,7 +13,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
 import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
-
+// import axios from 'axios'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -31,13 +32,14 @@ const Header = () => {
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('profile')))
     const history = useHistory()
     const location = useLocation()
-    const [showButton, setShowButton] = useState(true)
+
 
     useEffect(() => {
         setUser(JSON.parse(localStorage.getItem('profile')))
     },[location])
 
     
+
     const logout =() => {
         dispatch({ type: 'LOGOUT' })
         history.push('/')
@@ -47,6 +49,8 @@ const Header = () => {
 
     useEffect(()=> {
         const token = user?.token
+        // setUser(JSON.parse(localStorage.getItem('profile')))
+        //If token expires, logout the user
         if(token) {
             const decodedToken = decode(token)
             if(decodedToken.exp * 1000 < new Date().getTime()) logout()
@@ -102,22 +106,9 @@ const Header = () => {
 
     if(!user) return (
         <div className={styles.header2}>
-         <img style={{width: '50px', cursor: 'pointer', borderRadius :'4px'}} onClick={()=> history.push('/')} src="../logo.png" alt="arc-invoice" />
-        
-        {showButton && (
-        <button 
-          onClick={() => {
-            setShowButton(false); // Hide the button on click
-            history.push('/login');
-          }} 
-          className={styles.login}
-        >
-          Get started
-        </button>
-      )}
-        
+         <img style={{width: '50px', cursor: 'pointer'}} onClick={()=> history.push('/')} src="./logo.png" alt="arc-invoice" />
+        <button onClick={()=> history.push('/login')} className={styles.login}>Get started</button>
         </div>
-        
     )
     return (
         <div className={styles.header}>
@@ -140,7 +131,7 @@ const Header = () => {
               <Paper elevation={3}>
                 <ClickAwayListener onClickAway={handleClose}>
                   <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} >
-                    <MenuItem onClick={() => openLink('settings') }>{(user?.result?.name)}</MenuItem>
+                    <MenuItem onClick={() => openLink('settings') }>{(user?.result?.name).split(" ")[0]}</MenuItem>
                     <MenuItem onClick={()=> logout()} >Logout</MenuItem>
                   </MenuList>
                 </ClickAwayListener>
