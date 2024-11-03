@@ -1,0 +1,55 @@
+.pageContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #CFD0D2;
+  /* Adjust the background color to match your image */
+}
+
+.hero {
+  width: 50%;
+  margin: 30px auto;
+  line-height: 60px;
+  text-align: center;
+  color: #333;
+  /* Modify this to better match the image */
+}
+
+.hero h1 {
+  font-weight: 500;
+  font-size: 50px;
+  line-height: 50px;
+}
+
+.paragraph {
+  margin-top: 20px;
+  line-height: 20px;
+  color: gray;
+}
+
+.imgContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 600px;
+  border-radius: 14px;
+
+}
+
+
+
+@media only screen and (max-width: 600px) {
+  .hero {
+    width: 80%;
+    margin: 30px auto;
+    line-height: 60px;
+  }
+
+  .imgContainer img {
+    width: 100%;
+    max-width: 400px;
+
+  }
+}
