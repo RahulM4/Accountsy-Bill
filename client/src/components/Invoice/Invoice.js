@@ -93,7 +93,7 @@ const Invoice = () => {
           const response = await axios.get(`${process.env.REACT_APP_API}/invoices/count?searchQuery=${user?.result?._id}`);
         //   console.log(response.data);
         //Get total count of invoice from the server and increment by one to serialized numbering of invoice
-        setInvoiceData({...invoiceData, invoiceNumber: (Number(response.data) + 1).toString().padStart(3, '0')})
+        setInvoiceData({...invoiceData, invoiceNumber: Math.floor(10000 + Math.random() * 90000).toString()});
         } catch (error) {
           console.error(error);
         }

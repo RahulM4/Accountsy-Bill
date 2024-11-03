@@ -24,33 +24,31 @@ export default function Uploader({ form, setForm }) {
   const [file, setFile] = useState();
   const [progress, setProgress] = useState(0)
 
-    useEffect(() => {
-        setForm({...form, logo: file})
-        // eslint-disable-next-line
-    },[file])
+  useEffect(() => {
+    setForm({ ...form, logo: file })
+    // eslint-disable-next-line
+  }, [file])
 
   const onDrop = useCallback((acceptedFiles) => {
-    const url = "https://api.cloudinary.com/v1_1/almpo/image/upload";
+    const url = process.env.REACT_APP_CLOUDINARY_URL;
 
     acceptedFiles.forEach(async (acceptedFile) => {
-    //   const { signature, timestamp } = await getSignature();
+      //   const { signature, timestamp } = await getSignature();
 
       const formData = new FormData();
       formData.append("file", acceptedFile);
-      formData.append(
-        "upload_preset",
-        "invoice"
-      );
-      
+      formData.append("upload_preset","accountsyLogo");
+      formData.append("cloud_name" , "dzm13rwwt")
+
       const response = await fetch(url, {
-        method: "post",
+        method: "POST",
         body: formData,
       });
       setProgress(100)
       const data = await response.json();
-      
+      // console.log(data)                   
       setFile(data.secure_url)
-      console.log(data)
+      // console.log(data.secure_url)
     });
   }, []);
 
@@ -63,17 +61,17 @@ export default function Uploader({ form, setForm }) {
 
   return (
     <>
-        <div
-          {...getRootProps()}
-          className={`${styles.dropzone} ${isDragActive ? styles.active : null}`}
-        >
-          <input {...getInputProps()} />
+      <div
+        {...getRootProps()}
+        className={`${styles.dropzone} ${isDragActive ? styles.active : null}`}
+      >
+        <input {...getInputProps()} />
         Upload Logo
-        </div>
-        <Grid item style={{width: '100%'}}>
+      </div>
+      <Grid item style={{ width: '100%' }}>
         <BorderLinearProgress variant="determinate" value={progress} />
-        </Grid>
-      </>
+      </Grid>
+    </>
   );
 }
 

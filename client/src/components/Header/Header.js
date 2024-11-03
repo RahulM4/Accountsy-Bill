@@ -140,7 +140,7 @@ const Header = () => {
               <Paper elevation={3}>
                 <ClickAwayListener onClickAway={handleClose}>
                   <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown} >
-                    <MenuItem onClick={() => openLink('settings') }>{(user?.result?.name).split(" ")[0]}</MenuItem>
+                    <MenuItem onClick={() => openLink('settings') }>{(user?.result?.name)}</MenuItem>
                     <MenuItem onClick={()=> logout()} >Logout</MenuItem>
                   </MenuList>
                 </ClickAwayListener>
