@@ -32,7 +32,7 @@ const Settings = () => {
   const dispatch = useDispatch();
   const classes = useStyles();
   const { profiles } = useSelector((state) => state.profiles)
-  console.log(profiles)
+  // console.log(profiles)
  const [switchEdit, setSwitchEdit] = useState(0)
 
   // eslint-disable-next-line 

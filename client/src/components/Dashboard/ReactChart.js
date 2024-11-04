@@ -12,35 +12,35 @@ import { Animation } from '@devexpress/dx-react-chart';
 
 
 
-const ReactChart =({ paymentHistory }) => {
+const ReactChart = ({ paymentHistory }) => {
 
-    const payments = paymentHistory.map((payment) => {
-        return ({year: moment(payment.datePaid).format("MMM Do YY"), population: payment.amountPaid})
-      })
-
-
-      console.log(payments)
-
-    const data = payments
+  const payments = paymentHistory.map((payment) => {
+    return ({ year: moment(payment.datePaid).format("MMM Do YY"), population: payment.amountPaid })
+  })
 
 
-    return (
-      <Paper>
-        <Chart
-          data={data}
-        >
-          <ArgumentAxis />
-          <ValueAxis max={7} />
+  // console.log(payments)
 
-          <BarSeries
-            valueField="population"
-            argumentField="year"
-          />
-          <Title text="World population" />
-          <Animation />
-        </Chart>
-      </Paper>
-    );
-  }
+  const data = payments
 
-  export default ReactChart
+
+  return (
+    <Paper>
+      <Chart
+        data={data}
+      >
+        <ArgumentAxis />
+        <ValueAxis max={7} />
+
+        <BarSeries
+          valueField="population"
+          argumentField="year"
+        />
+        <Title text="World population" />
+        <Animation />
+      </Chart>
+    </Paper>
+  );
+}
+
+export default ReactChart
