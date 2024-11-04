@@ -45,6 +45,7 @@ export default function Uploader({ form, setForm }) {
       });
       setProgress(100)
       const data = await response.json();
+      console.log(data)
       setFile(data.secure_url)
 
     });

@@ -106,7 +106,7 @@ const Login = () => {
                 <div className={styles.option}>
                   <span>or</span>
                 </div>
-                <div> 
+                {/* <div> 
                   <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
                     <GoogleLogin
                       onSuccess={googleSuccess}
@@ -117,7 +117,7 @@ const Login = () => {
                       state_cookie_domain='single_host_origin'
                     />
                   </GoogleOAuthProvider>
-                </div>
+                </div> */}
           </div>
           <Grid container justifyContent="flex-end">
             <Grid item>

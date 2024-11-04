@@ -36,7 +36,6 @@ export const getInvoices = async (req, res) => {
 
     try {
         const allInvoices = await InvoiceModel.find({}).sort({_id:-1}) 
-
         res.status(200).json(allInvoices)
 
     } catch (error) {
@@ -52,7 +51,6 @@ export const getInvoices = async (req, res) => {
 export const createInvoice = async (req, res) => {
 
     const invoice = req.body
-
     const newInvoice = new InvoiceModel(invoice)
 
     try {

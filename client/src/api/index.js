@@ -1,6 +1,5 @@
 import axios from 'axios'
 
-// const API = axios.create({ baseURL: 'https://acc-bill-server.vercel.app'})
 const API = axios.create({ baseURL: process.env.REACT_APP_API})
 
 API.interceptors.request.use((req) => {
@@ -11,7 +10,7 @@ API.interceptors.request.use((req) => {
     return req
 })
 
-// export const fetchInvoices =() => API.get('/invoices')
+export const fetchInvoices =() => API.get('/invoices')
 export const fetchInvoice =(id) => API.get(`/invoices/${id}`)
 export const addInvoice =( invoice ) => API.post('/invoices', invoice)
 export const updateInvoice = (id, updatedInvoice) => API.patch(`/invoices/${id}`, updatedInvoice)

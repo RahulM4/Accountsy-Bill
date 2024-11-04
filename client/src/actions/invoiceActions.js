@@ -1,4 +1,4 @@
-import * as api from '../api/index'
+import * as api from '../api'
 
 import { ADD_NEW, UPDATE, DELETE, GET_INVOICE, FETCH_INVOICE_BY_USER, START_LOADING, END_LOADING } from './constants'
 
