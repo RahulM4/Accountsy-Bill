@@ -1,11 +1,11 @@
+
 .header {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    height: 60px;
-    border-bottom: 1px solid rgb(218, 218, 218);
-    margin-right: 30px;
-    /* background-color: #1976d2; */
+    height: 80px;
+    border-bottom: 2px solid var(--blue-theme-background-color);
+    background-color: var(--blue-theme-main-color );
   }
 
 
@@ -13,10 +13,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 60px;
-    border-bottom: 1px solid rgb(218, 218, 218);
+    height: 80px;
     padding-left: 20px;
-    /* background-color: #1976d2; */
+    border-bottom: 2px solid var(--blue-theme-background-color);
+    background-color: var(--blue-theme-main-color);
   }
 
   .logo {

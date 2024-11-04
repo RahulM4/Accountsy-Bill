@@ -2,23 +2,21 @@ import React, { useState } from 'react'
 import Field from './Field'
 import useStyles from './styles'
 import styles from './Login.module.css'
-import {GoogleLogin, GoogleOAuthProvider} from '@react-oauth/google'
-import jwtDecode from 'jwt-decode'
+// import {GoogleLogin, GoogleOAuthProvider} from '@react-oauth/google'
+// import jwtDecode from 'jwt-decode'
+// import { createProfile } from '../../actions/profile'
 import {useDispatch} from 'react-redux'
 import { useHistory, Link } from 'react-router-dom'
 import { signup, signin } from '../../actions/auth'
 import { Avatar, Button, Paper, Grid, Typography, Container } from '@material-ui/core'
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
-import { createProfile } from '../../actions/profile'
+import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
 import { useSnackbar } from 'react-simple-snackbar'
 import CircularProgress from '@material-ui/core/CircularProgress';
-
 
 
 const initialState ={ firstName: '', lastName: '', email: '', password: '', confirmPassword: '', profilePicture: '', bio: ''}
 
 const Login = () => {
-
     const classes = useStyles();
     const [formData, setFormData] = useState(initialState)
     const [isSignup, setIsSignup] = useState(false)
@@ -49,25 +47,23 @@ const Login = () => {
     const switchMode =() => {
         setIsSignup((prevState) => !prevState)
     }
-
-    const googleSuccess = async (res) => {
-        const result = jwtDecode(res.credential);
-        const token = res?.credential;
-        dispatch(createProfile({name: result?.name, email: result?.email, userId: result?.jti, phoneNumber: '', businessName: '', contactAddress: '', logo: result?.picture, website: ''}))
-
-        try {
-            dispatch({ type: "AUTH", data: {result, token}})
-
-            window.location.href='/dashboard'
-            
-        } catch (error) {
-            console.log(error)
-        }
-    }
-    const googleError =(error) => {
-        console.log(error)
-        console.log("Google Sign In was unseccassful. Try again later")
-    }
+    
+    // const googleSuccess = async (res) => {
+    //     const result = jwtDecode(res.credential);
+    //     const token = res?.credential;
+    //     dispatch(createProfile({name: result?.name, email: result?.email, userId: result?.jti, phoneNumber: '', businessName: '', contactAddress: '', logo: result?.picture, website: ''}))
+    //     try {
+    //         dispatch({ type: "AUTH", data: {result, token}})
+    //         window.location.href='/dashboard'
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
+    
+    // const googleError =(error) => {
+    //     console.log(error)
+    //     console.log("Google Sign In was unseccassful. Try again later")
+    // }
 
 
     if(user) {
@@ -75,12 +71,12 @@ const Login = () => {
     }
 
     return (
-        <Container component="main" maxWidth="xs">
-      <Paper className={classes.paper} elevation={2}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
+        <Container component="main" maxWidth="xs" >
+      <Paper className={classes.paper} elevation={10} style={{ backgroundColor: 'var(--blue-theme-background-color)', padding: '20px' }}>
+        <Avatar className={classes.avatar} style={{background :"var(--blue-theme-main-color)"}}>
+          <PersonOutlineIcon />
         </Avatar>
-        <Typography component="h1" variant="h5">{ isSignup ? 'Sign up' : 'Sign in' }</Typography>
+        <Typography style={{ fontWeight: '1000' , color: 'var(--blue-theme-main-color)'}} component="h1" variant="h5">{ isSignup ? 'Sign up' : 'Sign in' }</Typography>
         <form className={classes.form} onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             { isSignup && (
@@ -104,7 +100,7 @@ const Login = () => {
                     
                 </div>
                 <div className={styles.option}>
-                  <span>or</span>
+                  <span >OR</span>
                 </div>
                 {/* <div> 
                   <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
@@ -121,12 +117,12 @@ const Login = () => {
           </div>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Button onClick={switchMode}>
+              <Button onClick={switchMode}style={{ backgroundColor: 'var(--blue-theme-background-color)', color: 'var(--blue-theme-main-color)', fontWeight: '500' }}>
                 { isSignup ? 'Already have an account? Sign in' : "Don't have an account? Sign Up" }
               </Button>
             </Grid>
           </Grid>
-        <Link to="forgot"><p style={{textAlign: 'center', color: '#1d7dd6', marginTop: '20px'}}>Forgotten Password?</p></Link>
+        <Link style={{textDecoration: 'none'}} to="forgot"><p style={{textAlign: 'center', color: 'var(--blue-theme-main-color)', marginTop: '20px'}}>Forget Password?</p></Link>
         </form>
       </Paper>
     </Container>
