@@ -10,4 +10,4 @@ Built with the MERN stack (MongoDB, Express, React and NodeJS).
   * [Server](#server)
   * [Database](#database)
   * [Configuration and Setup](#configuration-and-setup)
-https://accountsy-invoice-generator.vercel.app/
+  * https://accountsy-invoice-generator.vercel.app/
