@@ -31,6 +31,31 @@ import { saveAs } from 'file-saver';
 import Modal from '../Payments/Modal'
 import PaymentHistory from './PaymentHistory'
 
+const ensureProtocol = (url) => {
+  if (!url) {
+    return ''
+  }
+
+  const trimmed = url.trim()
+
+  if (!trimmed) {
+    return ''
+  }
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed
+  }
+
+  return `http://${trimmed}`
+}
+
+const buildApiUrl = (path) => {
+  const base = ensureProtocol(process.env.REACT_APP_API) || 'http://localhost:5001'
+  const normalizedBase = base.replace(/\/$/, '')
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  return `${normalizedBase}${normalizedPath}`
+}
+
 const InvoiceDetails = () => {
 
     const location = useLocation()
@@ -118,7 +143,7 @@ const InvoiceDetails = () => {
 
   const createAndDownloadPdf = () => {
     setDownloadStatus('loading')
-    axios.post(`${process.env.REACT_APP_API}create-pdf`, 
+    axios.post(buildApiUrl('/create-pdf'), 
     { name: invoice.client.name,
       address: invoice.client.address,
       phone: invoice.client.phone,
@@ -137,7 +162,7 @@ const InvoiceDetails = () => {
       balanceDue: toCommas(total - totalAmountReceived),
       company: company,
   })
-      .then(() => axios.get(`${process.env.REACT_APP_API}/fetch-pdf`, { responseType: 'blob' }))
+      .then(() => axios.get(buildApiUrl('/fetch-pdf'), { responseType: 'blob' }))
       .then((res) => {
         const pdfBlob = new Blob([res.data], { type: 'application/pdf' });
 
@@ -150,7 +175,7 @@ const InvoiceDetails = () => {
   const sendPdf = (e) => {
     e.preventDefault()
     setSendStatus('loading')
-    axios.post(`${process.env.REACT_APP_API}send-pdf`, 
+    axios.post(buildApiUrl('/send-pdf'), 
     { name: invoice.client.name,
       address: invoice.client.address,
       phone: invoice.client.phone,

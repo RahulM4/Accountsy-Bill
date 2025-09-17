@@ -5,14 +5,12 @@ import cors from 'cors'
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import nodemailer from 'nodemailer'
-import pdf from 'html-pdf'
-
 import invoiceRoutes from './routes/invoices.js'
 import clientRoutes from './routes/clients.js'
 import userRoutes from './routes/userRoutes.js'
 
 import profile from './routes/profile.js'
-import pdfTemplate from './documents/index.js'
+import generateInvoicePdf from './documents/index.js'
 // import invoiceTemplate from './documents/invoice.js'
 import emailTemplate from './documents/email.js'
 
@@ -21,9 +19,45 @@ const app = express()
 const envResult = dotenv.config()
 const envFromFile = envResult?.parsed || {}
 
+const normalizeOrigin = (origin = '') => origin.replace(/\/$/, '')
+const defaultAllowedOrigins = [
+  'http://localhost:3000',
+  'https://accountsybill.com',
+  'https://www.accountsybill.com'
+]
+
+const extraOriginsFromEnv = (envFromFile.ALLOWED_ORIGINS || process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map((value) => normalizeOrigin(value.trim()))
+  .filter(Boolean)
+
+const allowedOrigins = Array.from(new Set([
+  ...defaultAllowedOrigins.map(normalizeOrigin),
+  ...extraOriginsFromEnv
+]))
+
 app.use((express.json({ limit: "30mb", extended: true})))
 app.use((express.urlencoded({ limit: "30mb", extended: true})))
-app.use((cors()))
+app.use((cors({
+  origin: (origin, callback) => {
+    if (!origin) {
+      return callback(null, true)
+    }
+
+    const normalized = normalizeOrigin(origin)
+    if (allowedOrigins.includes(normalized)) {
+      return callback(null, true)
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true)
+    }
+
+    console.warn(`Blocked CORS origin: ${origin}`)
+    return callback(new Error('Not allowed by CORS'))
+  },
+  credentials: true
+})))
 
 app.use('/invoices', invoiceRoutes)
 app.use('/clients', clientRoutes)
@@ -43,23 +77,13 @@ const transporter = nodemailer.createTransport({
     }
 })
 
-
-const pdfOptions = { format: 'A4' }
 let latestInvoicePdf = null
 
-const buildInvoicePdf = (payload = {}) => new Promise((resolve, reject) => {
-  try {
-    pdf.create(pdfTemplate(payload), pdfOptions).toBuffer((err, buffer) => {
-      if (err) {
-        return reject(err)
-      }
-      latestInvoicePdf = buffer
-      resolve(buffer)
-    })
-  } catch (error) {
-    reject(error)
-  }
-})
+const buildInvoicePdf = async (payload = {}) => {
+  const buffer = await generateInvoicePdf(payload)
+  latestInvoicePdf = buffer
+  return buffer
+}
 
 //SEND PDF INVOICE VIA EMAIL
 app.post('/send-pdf', async (req, res) => {
@@ -94,11 +118,6 @@ app.post('/send-pdf', async (req, res) => {
   }
 })
 
-
-//Problems downloading and sending invoice
-// npm install html-pdf -g
-// npm link html-pdf
-// npm link phantomjs-prebuilt
 
 //CREATE AND SEND PDF INVOICE
 app.post('/create-pdf', async (req, res) => {
