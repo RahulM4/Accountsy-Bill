@@ -118,7 +118,7 @@ const InvoiceDetails = () => {
 
   const createAndDownloadPdf = () => {
     setDownloadStatus('loading')
-    axios.post(`${process.env.REACT_APP_API}/create-pdf`, 
+    axios.post(`${process.env.REACT_APP_API}create-pdf`, 
     { name: invoice.client.name,
       address: invoice.client.address,
       phone: invoice.client.phone,
