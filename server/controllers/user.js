@@ -5,7 +5,16 @@ import bcrypt from 'bcryptjs'
 import dotenv from 'dotenv'
 
 dotenv.config()
-const SECRET = process.env.SECRET;
+const SECRET = process.env.SECRET || process.env.JWT_SECRET
+
+const requireJwtSecret = () => {
+    if(!SECRET) {
+        const error = new Error('Missing JWT secret. Set SECRET or JWT_SECRET in your environment variables.')
+        error.code = 'JWT_SECRET_MISSING'
+        throw error
+    }
+    return SECRET
+}
 const HOST =  process.env.SMTP_HOST
 const PORT =  process.env.SMTP_PORT
 const USER =  process.env.SMTP_USER
@@ -16,7 +25,7 @@ import ProfileModel from '../models/ProfileModel.js';
 
 
 export const signin = async (req, res)=> {
-    const { email, password } = req.body //Coming from formData
+    const { email, password } = req.body 
 
     try {
         const existingUser = await User.findOne({ email })
@@ -31,12 +40,16 @@ export const signin = async (req, res)=> {
         if(!isPasswordCorrect) return res.status(400).json({message: "Invalid credentials"})
 
         //If crednetials are valid, create a token for the user
-        const token = jwt.sign({ email: existingUser.email, id: existingUser._id }, SECRET, { expiresIn: "1h" })
-        
+        const token = jwt.sign({ email: existingUser.email, id: existingUser._id }, requireJwtSecret(), { expiresIn: "1h" })
+
         //Then send the token to the client/frontend
         res.status(200).json({ result: existingUser, userProfile, token })
 
     } catch (error) {
+        console.error('Signin error:', error)
+        if (error?.code === 'JWT_SECRET_MISSING') {
+            return res.status(500).json({ message: 'Server configuration error. Please contact support.' })
+        }
         res.status(500).json({ message: "Something went wrong"})
     }
 }
@@ -58,11 +71,15 @@ export const signup = async (req, res)=> {
 
         const result = await User.create({ email, password: hashedPassword, name: `${firstName} ${lastName}`, bio })
 
-        const token = jwt.sign({ email: result.email, id: result._id }, SECRET, { expiresIn: "1h" })
-        
+        const token = jwt.sign({ email: result.email, id: result._id }, requireJwtSecret(), { expiresIn: "1h" })
+
         res.status(200).json({ result, userProfile, token })
 
     } catch (error) {
+        console.error('Signup error:', error)
+        if (error?.code === 'JWT_SECRET_MISSING') {
+            return res.status(500).json({ message: 'Server configuration error. Please contact support.' })
+        }
         res.status(500).json({ message: "Something went wrong"}) 
     }
 }

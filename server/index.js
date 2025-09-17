@@ -22,7 +22,9 @@ import pdfTemplate from './documents/index.js'
 import emailTemplate from './documents/email.js'
 
 const app = express()
-dotenv.config()
+// Load .env and also keep parsed values so we can prefer file-defined settings in local dev
+const envResult = dotenv.config()
+const envFromFile = envResult?.parsed || {}
 
 app.use((express.json({ limit: "30mb", extended: true})))
 app.use((express.urlencoded({ limit: "30mb", extended: true})))
@@ -102,18 +104,46 @@ app.get('/', (req, res) => {
     res.send('SERVER IS RUNNING')
   })
 
-const DB_URL = process.env.DB_URL
-const PORT = process.env.PORT || 5000
+// Prefer .env values first (local dev), then fall back to process.env (deployment)
+const PORT = process.env.PORT || 5001
+const MONGODB_URI =  process.env.MONGODB_URI
 
-mongoose.connect(DB_URL, { useNewUrlParser: true, useUnifiedTopology: true})
-    .then(() => {
-        app.listen(PORT, () =>
-        console.log(`Server running on port: ${PORT} and Database connection established`));
-        
+if (!MONGODB_URI) {
+  console.error('Missing MongoDB connection string. Set `MONGODB_URI` (or `DB_URL`) in your environment/.env')
+  process.exit(1)
+}
+
+// Guard against legacy multi-host mongodb:// URLs that trigger Node URL deprecation warnings
+if (MONGODB_URI.startsWith('mongodb://') && MONGODB_URI.includes(',')) {
+  console.warn('Detected legacy multi-host mongodb:// URL. For Atlas, switch to mongodb+srv:// format to avoid Node URL warnings.')
+}
+
+// Redact credentials for safe logging
+const redactMongoUri = (uri) => {
+  try {
+    return uri.replace(/:\/\/.*?@/, '://<redacted>@')
+  } catch (_) {
+    return '<redacted>'
+  }
+}
+
+console.log(`MongoDB URI source: ${envFromFile.MONGODB_URI || envFromFile.DB_URL ? '.env file' : 'process.env'}`)
+console.log(`MongoDB URI preview: ${redactMongoUri(MONGODB_URI)}`)
+
+;(async () => {
+  try {
+    // For mongoose v5, prefer createIndex over ensureIndex and turn off findAndModify
+    mongoose.set('useCreateIndex', true)
+    mongoose.set('useFindAndModify', false)
+
+    // Keep new URL parser and unified topology enabled
+    await mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port: ${PORT} and Database connection established`)
     })
-    .catch((error) => console.error('Database connection error:', error));
-    
-
-mongoose.set('useFindAndModify', false)
-mongoose.set('useCreateIndex', true)
-
+  } catch (error) {
+    console.error('Database connection error:', error?.message || error)
+    process.exit(1)
+  }
+})()

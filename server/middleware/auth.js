@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 
 dotenv.config()
-const SECRET = process.env.SECRET;
+const SECRET = process.env.SECRET || process.env.JWT_SECRET
 
 const auth = async (req, res, next) => {
     try {
@@ -13,6 +13,10 @@ const auth = async (req, res, next) => {
 
         //If token is custom token do this
         if(token && isCustomAuth) {
+            if(!SECRET) {
+                console.error('JWT secret missing. Set SECRET or JWT_SECRET environment variable.')
+                return res.status(500).json({ message: 'Server configuration error' })
+            }
             decodeData = jwt.verify(token, SECRET)
 
             req.userId = decodeData?.id
@@ -27,7 +31,8 @@ const auth = async (req, res, next) => {
         next()
 
     } catch (error) {
-        console.log(error)
+        console.error('Auth middleware error:', error)
+        return res.status(401).json({ message: 'Authentication failed' })
     }
 }
 
