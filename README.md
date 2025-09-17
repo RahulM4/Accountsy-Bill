@@ -17,5 +17,5 @@ update existing repository from vs code
 git init 
 git pull origin main 
 git add . 
-git commit -m "commit message" 
+git commit -m "updated"
 git push origin main

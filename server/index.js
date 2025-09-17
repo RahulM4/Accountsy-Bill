@@ -6,11 +6,6 @@ import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import nodemailer from 'nodemailer'
 import pdf from 'html-pdf'
-import { fileURLToPath } from 'url'
-import { dirname } from 'path'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
 
 import invoiceRoutes from './routes/invoices.js'
 import clientRoutes from './routes/clients.js'
@@ -49,34 +44,55 @@ const transporter = nodemailer.createTransport({
 })
 
 
-var options = { format: 'A4' };
+const pdfOptions = { format: 'A4' }
+let latestInvoicePdf = null
+
+const buildInvoicePdf = (payload = {}) => new Promise((resolve, reject) => {
+  try {
+    pdf.create(pdfTemplate(payload), pdfOptions).toBuffer((err, buffer) => {
+      if (err) {
+        return reject(err)
+      }
+      latestInvoicePdf = buffer
+      resolve(buffer)
+    })
+  } catch (error) {
+    reject(error)
+  }
+})
+
 //SEND PDF INVOICE VIA EMAIL
-app.post('/send-pdf', (req, res) => {
-    const { email, company } = req.body
+app.post('/send-pdf', async (req, res) => {
+  const { email, company = {} } = req.body || {}
 
-    // pdf.create(pdfTemplate(req.body), {}).toFile('invoice.pdf', (err) => {
-    pdf.create(pdfTemplate(req.body), options).toFile('invoice.pdf', (err) => {
-       
-          // send mail with defined transport object
-        transporter.sendMail({
-            from: ` Accountsy Bill rahulforcoding4@gmail.com`, // sender address
-            to: `${email}`, // list of receivers
-            replyTo: `${company.email}`,
-            subject: `Invoice from ${company.businessName ? company.businessName : company.name}`, // Subject line
-            text: `Invoice from ${company.businessName ? company.businessName : company.name }`, // plain text body
-            html: emailTemplate(req.body), // html body
-            attachments: [{
-                filename: 'invoice.pdf',
-                path: `${__dirname}/invoice.pdf`
-            }]
-        });
+  if (!email) {
+    return res.status(400).json({ error: 'Recipient email is required' })
+  }
 
-        if(err) {
-            res.send(Promise.reject());
+  try {
+    const pdfBuffer = await buildInvoicePdf(req.body)
+
+    await transporter.sendMail({
+      from: `Accountsy Bill <${process.env.SMTP_USER || 'no-reply@accountsybill.com'}>`,
+      to: email,
+      replyTo: company?.email,
+      subject: `Invoice from ${company?.businessName || company?.name || 'Accountsy Bill'}`,
+      text: `Invoice from ${company?.businessName || company?.name || 'Accountsy Bill'}`,
+      html: emailTemplate(req.body),
+      attachments: [
+        {
+          filename: 'invoice.pdf',
+          content: pdfBuffer
         }
-        res.send(Promise.resolve());
-    });
-});
+      ]
+    })
+
+    res.status(200).json({ success: true })
+  } catch (error) {
+    console.error('Failed to send invoice email:', error)
+    res.status(500).json({ error: 'Failed to send invoice email' })
+  }
+})
 
 
 //Problems downloading and sending invoice
@@ -85,18 +101,25 @@ app.post('/send-pdf', (req, res) => {
 // npm link phantomjs-prebuilt
 
 //CREATE AND SEND PDF INVOICE
-app.post('/create-pdf', (req, res) => {
-    pdf.create(pdfTemplate(req.body), {}).toFile('invoice.pdf', (err) => {
-        if(err) {
-            res.send(Promise.reject());
-        }
-        res.send(Promise.resolve());
-    });
-});
+app.post('/create-pdf', async (req, res) => {
+  try {
+    await buildInvoicePdf(req.body)
+    res.status(200).json({ success: true })
+  } catch (error) {
+    console.error('Failed to create invoice PDF:', error)
+    res.status(500).json({ error: 'Failed to create invoice PDF' })
+  }
+})
 
 //SEND PDF INVOICE
 app.get('/fetch-pdf', (req, res) => {
-     res.sendFile(`${__dirname}/invoice.pdf`)
+  if (!latestInvoicePdf) {
+    return res.status(404).json({ error: 'No invoice PDF available. Create one first.' })
+  }
+
+  res.setHeader('Content-Type', 'application/pdf')
+  res.setHeader('Content-Disposition', 'attachment; filename=invoice.pdf')
+  res.send(latestInvoicePdf)
 })
 
 

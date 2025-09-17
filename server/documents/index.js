@@ -1,26 +1,31 @@
 import moment from 'moment'
 
-export default function (
-   { name,
-      address,
-      phone,
-      email,
-      dueDate,
-      date,
-      id,
-      notes,
-      subTotal,
-      type,
-      vat,
-      total,
-      items,
-      status,
-      totalAmountReceived,
-      balanceDue,
-      company,
-   }) {
-    const today = new Date();
-return `
+export default function (invoice = {}) {
+  const {
+    name = '',
+    address = '',
+    phone = '',
+    email = '',
+    dueDate,
+    date,
+    id = '',
+    notes = '',
+    subTotal = '',
+    type = '',
+    vat = '',
+    total = '',
+    items = [],
+    status = '',
+    totalAmountReceived = '',
+    balanceDue = '',
+    company = {}
+  } = invoice
+
+  const safeItems = Array.isArray(items) ? items : []
+  const safeCompany = company || {}
+  const companyName = safeCompany.businessName || safeCompany.name || ''
+
+  return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -112,7 +117,7 @@ img {
 <div class="invoice-container">
 <section  class="header">
         <div>
-          ${company?.logo ? `<img src=${company?.logo} />` : `<h2>___</h2>`}
+          ${safeCompany?.logo ? `<img src=${safeCompany?.logo} />` : `<h2>___</h2>`}
         </div>
         <div class="receipt-id" style="margin-top: -120px 0 40px 0">
             
@@ -122,10 +127,10 @@ img {
 
       <div>
           <p class="title">From:</p>
-          <h4 style="font-size: 9px; line-height: 5px">${company.businessName ? company.businessName : company.name}</h4>
-          <p style="font-size: 9px; line-height: 5px">${company.email}</p>
-          <p style="font-size: 9px; line-height: 5px">${company.phoneNumber}</p>
-          <p style="font-size: 9px; line-height: 5px">${company.contactAddress}</p>
+          <h4 style="font-size: 9px; line-height: 5px">${companyName}</h4>
+          <p style="font-size: 9px; line-height: 5px">${safeCompany.email || ''}</p>
+          <p style="font-size: 9px; line-height: 5px">${safeCompany.phoneNumber || ''}</p>
+          <p style="font-size: 9px; line-height: 5px">${safeCompany.contactAddress || ''}</p>
       </div>
 
       <div style="margin-bottom: 100px; margin-top: 20px">
@@ -142,9 +147,9 @@ img {
         <p class="title" style="font-size: 8px">Status</p>
         <h3 style="font-size: 12px">${status}</h3>
         <p class="title" style="font-size: 8px">Date</p>
-        <p  style="font-size: 9px" >${moment(date).format('ll')}</p>
+        <p  style="font-size: 9px" >${date ? moment(date).format('ll') : ''}</p>
         <p class="title"  style="font-size: 8px">Due Date</p>
-        <p  style="font-size: 9px">${moment(dueDate).format('ll')}</p>
+        <p  style="font-size: 9px">${dueDate ? moment(dueDate).format('ll') : ''}</p>
         <p class="title"  style="font-size: 8px">Amount</p>
         <h3 style="font-size: 12px">${total}</h3>
     </div>
@@ -160,7 +165,7 @@ img {
   </tr>
 
   ${
-   items.map((item) => (
+   safeItems.map((item) => (
  `  <tr>
     <td style="font-size: 9px">${item.itemName}</td>
     <td style="font-size: 9px">${item.quantity}</td>
@@ -168,7 +173,7 @@ img {
     <td style="font-size: 9px">${item.discount}</td>
     <td style="text-align: right; font-size: 9px">${(item.quantity * item.unitPrice) - (item.quantity * item.unitPrice) * item.discount / 100}</td>
   </tr>`
-   ))
+   )).join('')
   }
 
 
@@ -216,4 +221,4 @@ img {
 </body>
 </html>`
 ;
-};
+}

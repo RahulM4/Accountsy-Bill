@@ -1,15 +1,18 @@
 import moment from 'moment'
 
-export default function (
-    {
+export default function (payload = {}) {
+    const {
         dueDate,
-        type,
-        balanceDue,
-        company,
-        link,
-        id,
+        type = '',
+        balanceDue = 0,
+        company = {},
+        link = '',
+        id = ''
+    } = payload
 
-    }) {
+    const safeCompany = company || {}
+    const companyName = safeCompany.businessName || safeCompany.name || ''
+
     // const today = new Date();
     return `
 <!DOCTYPE html>
@@ -123,12 +126,12 @@ hr {
     <body>
         <div class="layout">
         <div class="content">
-            <img src=${company.logo} class="logo" />
-            <h1 class="name">${company.businessName ? company.businessName : company.name}</h1>
+            ${safeCompany?.logo ? `<img src=${safeCompany.logo} class="logo" />` : ''}
+            <h1 class="name">${companyName}</h1>
             
               <hr>
               <div>
-                  <p style="font-size: 18px">${Number(balanceDue) <= 0 ? 'Thank you for your business' : type} ${Number(balanceDue) != 0 ? 'for' : ''} <span style="font-weight: 700">${Number(balanceDue) <= 0 ? '' : balanceDue}</span> ${Number(balanceDue) <= 0 ? '' : `due by`} <span style="font-weight: 700">${Number(balanceDue) <= 0 ? '' : moment(dueDate).format("MMM Do YYYY")}</span></p>
+                  <p style="font-size: 18px">${Number(balanceDue) <= 0 ? 'Thank you for your business' : type} ${Number(balanceDue) !== 0 ? 'for' : ''} <span style="font-weight: 700">${Number(balanceDue) <= 0 ? '' : balanceDue}</span> ${Number(balanceDue) <= 0 ? '' : `due by`} <span style="font-weight: 700">${Number(balanceDue) <= 0 ? '' : moment(dueDate).format("MMM Do YYYY")}</span></p>
               </div>
               
               <div class="link-container">
@@ -140,9 +143,9 @@ hr {
               <p style="font-size: 14px; padding: 20px">#${id}</p>
               
               <div class="address">
-                  <h2>${company.businessName}</h2>
-                  <p>${company.phoneNumber}</p>
-                  <p>${company.website ? company?.website : ''}</p>
+                  <h2>${companyName}</h2>
+                  <p>${safeCompany.phoneNumber || ''}</p>
+                  <p>${safeCompany?.website ? safeCompany.website : ''}</p>
                   
               </div>
         </div>
