@@ -11,3 +11,11 @@ Built with the MERN stack (MongoDB, Express, React and NodeJS).
   * [Database](#database)
   * [Configuration and Setup](#configuration-and-setup)
   * https://accountsy-invoice-generator.vercel.app/
+
+# push 
+update existing repository from vs code 
+git init 
+git pull origin main 
+git add . 
+git commit -m "commit message" 
+git push origin main
