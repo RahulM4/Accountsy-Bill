@@ -73,10 +73,37 @@ export const createApp = () => {
 
   let latestInvoicePdf = null
 
+  const sanitizeFilenamePart = (value, fallback) => {
+    const normalized = String(value || '').trim().toLowerCase()
+      .replace(/\s+/g, '_')
+      .replace(/[^a-z0-9_-]/g, '')
+
+    return normalized || fallback
+  }
+
+  const buildInvoiceFilename = (payload = {}) => {
+    const usernameSource = payload?.username
+      || payload?.userName
+      || payload?.company?.name
+      || payload?.company?.businessName
+      || (payload?.company?.email ? payload.company.email.split('@')[0] : null)
+
+    const billNumberSource = payload?.invoiceNumber
+      || payload?.invoice?.invoiceNumber
+      || payload?.id
+      || payload?.invoiceNo
+
+    const usernamePart = sanitizeFilenamePart(usernameSource, 'invoice')
+    const billNumberPart = sanitizeFilenamePart(billNumberSource, 'document')
+
+    return `${usernamePart}_${billNumberPart}.pdf`
+  }
+
   const buildInvoicePdf = async (payload = {}) => {
     const buffer = await generateInvoicePdf(payload)
-    latestInvoicePdf = buffer
-    return buffer
+    const filename = buildInvoiceFilename(payload)
+    latestInvoicePdf = { buffer, filename }
+    return { buffer, filename }
   }
 
   app.post('/send-pdf', async (req, res) => {
@@ -87,7 +114,7 @@ export const createApp = () => {
     }
 
     try {
-      const pdfBuffer = await buildInvoicePdf(req.body)
+      const { buffer: pdfBuffer, filename } = await buildInvoicePdf(req.body)
 
       await transporter.sendMail({
         from: `Accountsy Bill <${process.env.SMTP_USER || 'no-reply@accountsybill.com'}>`,
@@ -98,7 +125,7 @@ export const createApp = () => {
         html: emailTemplate(req.body),
         attachments: [
           {
-            filename: 'invoice.pdf',
+            filename,
             content: pdfBuffer
           }
         ]
@@ -122,13 +149,13 @@ export const createApp = () => {
   })
 
   app.get('/fetch-pdf', (req, res) => {
-    if (!latestInvoicePdf) {
+    if (!latestInvoicePdf?.buffer) {
       return res.status(404).json({ error: 'No invoice PDF available. Create one first.' })
     }
 
     res.setHeader('Content-Type', 'application/pdf')
-    res.setHeader('Content-Disposition', 'attachment; filename=invoice.pdf')
-    res.send(latestInvoicePdf)
+    res.setHeader('Content-Disposition', `attachment; filename=${latestInvoicePdf.filename}`)
+    res.send(latestInvoicePdf.buffer)
   })
 
   app.get('/', (req, res) => {

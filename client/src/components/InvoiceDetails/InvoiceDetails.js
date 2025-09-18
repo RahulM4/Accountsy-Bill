@@ -67,6 +67,21 @@ const buildAppUrl = (path) => {
   return `${normalizedBase}${normalizedPath}`
 }
 
+const sanitizeForFilename = (value, fallback) => {
+  const normalized = String(value || '').trim().toLowerCase()
+    .replace(/\s+/g, '_')
+    .replace(/[^a-z0-9_-]/g, '')
+
+  return normalized || fallback
+}
+
+const buildInvoicePdfFilename = (username, billNumber) => {
+  const usernamePart = sanitizeForFilename(username, 'invoice')
+  const billNumberPart = sanitizeForFilename(billNumber, 'document')
+
+  return `${usernamePart}_${billNumberPart}.pdf`
+}
+
 const InvoiceDetails = () => {
 
     const location = useLocation()
@@ -152,7 +167,41 @@ const InvoiceDetails = () => {
     history.push(`/edit/invoice/${id}`)
   }
 
+  const resolveUsernameForFilename = () => {
+    if (user?.result?.name) {
+      return user.result.name
+    }
+
+    if (company?.businessName) {
+      return company.businessName
+    }
+
+    if (company?.name) {
+      return company.name
+    }
+
+    if (user?.result?.email) {
+      return user.result.email.split('@')[0]
+    }
+
+    if (company?.email) {
+      return company.email.split('@')[0]
+    }
+
+    return ''
+  }
+
+  const resolveBillNumberForFilename = () =>
+    invoice?.invoiceNumber
+    || invoiceData?.invoiceNumber
+    || invoice?._id
+    || ''
+
   const createAndDownloadPdf = () => {
+    const usernameForFilename = resolveUsernameForFilename()
+    const billNumberForFilename = resolveBillNumberForFilename()
+    const pdfFilename = buildInvoicePdfFilename(usernameForFilename, billNumberForFilename)
+
     setDownloadStatus('loading')
     axios.post(buildApiUrl('/create-pdf'), 
     { name: invoice.client.name,
@@ -162,6 +211,7 @@ const InvoiceDetails = () => {
       dueDate: invoice.dueDate,
       date: invoice.createdAt,
       id: invoice.invoiceNumber,
+      invoiceNumber: invoice.invoiceNumber,
       notes: invoice.notes,
       subTotal: toCommas(invoice.subTotal),
       total: toCommas(invoice.total),
@@ -172,12 +222,13 @@ const InvoiceDetails = () => {
       totalAmountReceived: toCommas(totalAmountReceived),
       balanceDue: toCommas(total - totalAmountReceived),
       company: company,
+      username: usernameForFilename,
   })
       .then(() => axios.get(buildApiUrl('/fetch-pdf'), { responseType: 'blob' }))
       .then((res) => {
         const pdfBlob = new Blob([res.data], { type: 'application/pdf' });
 
-        saveAs(pdfBlob, 'invoice.pdf')
+        saveAs(pdfBlob, pdfFilename)
       }).then(() =>  setDownloadStatus('success'))
   }
 
@@ -186,6 +237,8 @@ const InvoiceDetails = () => {
   const sendPdf = (e) => {
     e.preventDefault()
     setSendStatus('loading')
+    const usernameForFilename = resolveUsernameForFilename()
+
     axios.post(buildApiUrl('/send-pdf'), 
     { name: invoice.client.name,
       address: invoice.client.address,
@@ -194,6 +247,7 @@ const InvoiceDetails = () => {
       dueDate: invoice.dueDate,
       date: invoice.createdAt,
       id: invoice.invoiceNumber,
+      invoiceNumber: invoice.invoiceNumber,
       notes: invoice.notes,
       subTotal: toCommas(invoice.subTotal),
       total: toCommas(invoice.total),
@@ -205,6 +259,7 @@ const InvoiceDetails = () => {
       balanceDue: toCommas(total - totalAmountReceived),
       link: buildAppUrl(`/invoice/${invoice._id}`),
       company: company,
+      username: usernameForFilename,
   })
   // .then(() => console.log("invoice sent successfully"))
   .then(() => setSendStatus('success'))
