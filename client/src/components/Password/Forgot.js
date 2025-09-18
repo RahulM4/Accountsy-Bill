@@ -13,13 +13,26 @@ const Forgot = () => {
   const history = useHistory()
   const [form, setForm] = useState("");
   const [step, setStep] = useState(0)
+  const [errorMessage, setErrorMessage] = useState('Please check your internet connection and try again')
   const dispatch = useDispatch();
  const user = JSON.parse(localStorage.getItem('profile'))
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    dispatch(forgot({email: form}))
-    window.navigator.onLine ? setStep(1) : setStep(2)
+
+    try {
+      await dispatch(forgot({email: form}))
+      setStep(1)
+    } catch (error) {
+      if (!window.navigator.onLine) {
+        setErrorMessage('Please check your internet connection and try again')
+      } else {
+        const fallbackMessage = 'Unable to send a password reset link. Please try again.'
+        const apiMessage = error?.response?.data?.error || error?.response?.data?.message
+        setErrorMessage(apiMessage || fallbackMessage)
+      }
+      setStep(2)
+    }
   }
 
   const handleChange = (e) => setForm(e.target.value);
@@ -58,7 +71,7 @@ const Forgot = () => {
                   <div>
                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}> <i className="fas fa-check-circle" style={{fontSize: '55px', color: '#3e6947'}}></i></div>
                     <br/>
-                    <p>Please check your internet connection and try again</p>
+                    <p>{errorMessage}</p>
                     <div className={styles.buttons}>
                         <button className={styles.button} onClick={() =>history.push('/')}>Back to home</button>
                         <button className={styles.button} onClick={()=>setStep(0)}>Resend link</button>

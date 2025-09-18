@@ -122,7 +122,7 @@ const Login = () => {
               </Button>
             </Grid>
           </Grid>
-        <Link style={{textDecoration: 'none'}} to="forgot"><p style={{textAlign: 'center', color: 'var(--blue-theme-main-color)', marginTop: '20px'}}>Forget Password?</p></Link>
+        <Link style={{textDecoration: 'none'}} to="/forgot"><p style={{textAlign: 'center', color: 'var(--blue-theme-main-color)', marginTop: '20px'}}>Forget Password?</p></Link>
         </form>
       </Paper>
     </Container>

@@ -132,11 +132,11 @@ export const forgotPassword = (req,res)=>{
             user.save().then((result)=>{
                 transporter.sendMail({
                     to:user.email,
-                    from:"Accountsybill <help@accountsybill.com>",
+                    from:"Accountsybill <rahulforcoding4@gmail.com>",
                     subject:"Password reset request",
                     html:`
-                    <p>You requested for password reset from Arc Invoicing application</p>
-                    <h5>Please click this <a href="https://accountsybill.com/reset/${token}">link</a> to reset your password</h5>
+                    <p>You requested for password reset from Accountansy Invoicing application</p>
+                    <h5>Please click this <button></button><a href="https://accountsybill.com/reset/${token}">link</a> </button> to reset your password</h5>
                     <p>Link not clickable?, copy and paste the following url in your address bar.</p>
                     <p>https://accountsybill.com/reset/${token}</p>
                     <P>If this was a mistake, just ignore this email and nothing will happen.</P>

@@ -42,11 +42,13 @@ export const signup =(formData, openSnackbar, setLoading) => async(dispatch) => 
 
 
 
-export const forgot =(formData) => async(dispatch) => {
+export const forgot =(formData) => async () => {
     try {
-        await api.forgot(formData)
+        const { data } = await api.forgot(formData)
+        return data
     } catch (error) {
         console.log(error)
+        throw error
     }
 }
 
