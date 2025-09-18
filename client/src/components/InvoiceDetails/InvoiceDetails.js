@@ -56,6 +56,17 @@ const buildApiUrl = (path) => {
   return `${normalizedBase}${normalizedPath}`
 }
 
+const buildAppUrl = (path) => {
+  const envUrl = ensureProtocol(process.env.REACT_APP_URL)
+  const base = envUrl || (typeof window !== 'undefined' ? window.location.origin : '')
+  const normalizedBase = base.replace(/\/$/, '')
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  if (!normalizedBase) {
+    return normalizedPath
+  }
+  return `${normalizedBase}${normalizedPath}`
+}
+
 const InvoiceDetails = () => {
 
     const location = useLocation()
@@ -192,7 +203,7 @@ const InvoiceDetails = () => {
       status: invoice.status,
       totalAmountReceived: toCommas(totalAmountReceived),
       balanceDue: toCommas(total - totalAmountReceived),
-      link: `${process.env.REACT_APP_URL}/invoice/${invoice._id}`,
+      link: buildAppUrl(`/invoice/${invoice._id}`),
       company: company,
   })
   // .then(() => console.log("invoice sent successfully"))
