@@ -2,15 +2,10 @@
   "version": 2,
   "functions": {
     "index.js": {
+      "runtime": "nodejs18.x",
       "includeFiles": "node_modules/pdfkit/js/data/**"
     }
   },
-  "builds": [
-    {
-      "src": "index.js",
-      "use": "@vercel/node"
-    }
-  ],
   "routes": [
     {
       "src": "/(.*)",
