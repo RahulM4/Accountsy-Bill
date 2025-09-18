@@ -136,9 +136,9 @@ export const forgotPassword = (req,res)=>{
                     subject:"Password reset request",
                     html:`
                     <p>You requested for password reset from Accountansy Invoicing application</p>
-                    <h5>Please click this <button></button><a href="https://accountsybill.com/reset/${token}">link</a> </button> to reset your password</h5>
+                    <h5>Please click this <button></button><a href="https://accountsy-bill-munna.vercel.app/reset/${token}">link</a> </button> to reset your password</h5>
                     <p>Link not clickable?, copy and paste the following url in your address bar.</p>
-                    <p>https://accountsybill.com/reset/${token}</p>
+                    <p>https://accountsy-bill-munna.vercel.app/${token}</p>
                     <P>If this was a mistake, just ignore this email and nothing will happen.</P>
                     `
                 })
