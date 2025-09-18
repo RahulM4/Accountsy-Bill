@@ -13,6 +13,7 @@ const Forgot = () => {
   const history = useHistory()
   const [form, setForm] = useState("");
   const [step, setStep] = useState(0)
+  const [successMessage, setSuccessMessage] = useState('A password reset link has been sent to your email. Please follow the link to reset your password')
   const [errorMessage, setErrorMessage] = useState('Please check your internet connection and try again')
   const dispatch = useDispatch();
  const user = JSON.parse(localStorage.getItem('profile'))
@@ -21,7 +22,10 @@ const Forgot = () => {
     e.preventDefault()
 
     try {
-      await dispatch(forgot({email: form}))
+      const response = await dispatch(forgot({email: form}))
+      if (response?.message) {
+        setSuccessMessage(response.message)
+      }
       setStep(1)
     } catch (error) {
       if (!window.navigator.onLine) {
@@ -59,7 +63,7 @@ const Forgot = () => {
                   <div>
                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}> <i className="fas fa-check-circle" style={{fontSize: '55px', color: '#3e6947'}}></i></div>
                     <br/>
-                    <p>A password reset link has been sent to your email. Please follow the link to reset your password</p>
+                    <p>{successMessage}</p>
                     <div className={styles.buttons}>
                         <button className={styles.button} onClick={() =>history.push('/')}>Back to home</button>
                         <button className={styles.button} onClick={()=>setStep(0)}>Resend link</button>
