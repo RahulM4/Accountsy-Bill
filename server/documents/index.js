@@ -220,7 +220,12 @@ const loadLogoBuffer = async (source) => {
   }
 
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-    return fetchBufferFromUrl(trimmed)
+    try {
+      return await fetchBufferFromUrl(trimmed)
+    } catch (error) {
+      console.warn('Failed to load invoice logo from URL; continuing without logo.', error?.message || error)
+      return null
+    }
   }
 
   try {
@@ -422,7 +427,13 @@ export default async function generateInvoicePdf(payload = {}) {
   const companyName = safeCompany.businessName || safeCompany.name || 'Accountsy Bill'
   const documentTitle = Number(toNumber(balanceDue)) <= 0 ? 'Receipt' : (type || 'Invoice')
 
-  const logoBuffer = await loadLogoBuffer(safeCompany.logo)
+  let logoBuffer = null
+
+  try {
+    logoBuffer = await loadLogoBuffer(safeCompany.logo)
+  } catch (error) {
+    console.warn('Skipping invoice logo due to load failure.', error?.message || error)
+  }
 
   return new Promise((resolve, reject) => {
     try {
@@ -454,12 +465,20 @@ export default async function generateInvoicePdf(payload = {}) {
       let companyTextWidth = companyColumnWidth
 
       if (logoBuffer) {
-        doc.save()
-        doc.rect(marginLeft, headerPaddingY - 6, logoSize + 12, logoSize + 12).fillOpacity(0.15).fill(colors.white)
-        doc.restore()
-        doc.image(logoBuffer, marginLeft + 6, headerPaddingY, { fit: [logoSize, logoSize], align: 'left' })
-        companyTextX = marginLeft + logoSize + 20
-        companyTextWidth = Math.max(companyColumnWidth - (logoSize + 20), 120)
+        try {
+          doc.save()
+          doc
+            .rect(marginLeft, headerPaddingY - 6, logoSize + 12, logoSize + 12)
+            .fillOpacity(0.15)
+            .fill(colors.white)
+          doc.restore()
+          doc.image(logoBuffer, marginLeft + 6, headerPaddingY, { fit: [logoSize, logoSize], align: 'left' })
+          companyTextX = marginLeft + logoSize + 20
+          companyTextWidth = Math.max(companyColumnWidth - (logoSize + 20), 120)
+        } catch (error) {
+          console.warn('Skipping invoice logo due to render failure.', error?.message || error)
+          logoBuffer = null
+        }
       }
 
       doc
