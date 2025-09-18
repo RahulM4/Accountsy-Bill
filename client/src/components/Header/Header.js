@@ -104,11 +104,25 @@ const Header = () => {
           >
             <Avatar style={{ backgroundColor: '#1976D2' }}>{user?.result?.name?.charAt(0)}</Avatar>
           </Button>
-          <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+          <Popper
+            open={open}
+            anchorEl={anchorRef.current}
+            role={undefined}
+            transition
+            disablePortal
+            placement="bottom-end"
+            modifiers={{
+              offset: { enabled: true, offset: '0,8' },
+              preventOverflow: { enabled: true, boundariesElement: 'viewport' },
+              flip: { enabled: true }
+            }}
+          >
             {({ TransitionProps, placement }) => (
               <Grow
                 {...TransitionProps}
-                style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+                style={{
+                  transformOrigin: placement && placement.startsWith('bottom') ? 'right top' : 'right bottom'
+                }}
               >
                 <Paper elevation={3}>
                   <ClickAwayListener onClickAway={handleClose}>
