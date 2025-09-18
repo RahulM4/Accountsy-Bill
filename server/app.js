@@ -14,7 +14,8 @@ const normalizeOrigin = (origin = '') => origin.replace(/\/$/, '')
 const defaultAllowedOrigins = [
   'http://localhost:3000',
   'https://accountsybill.com',
-  'https://www.accountsybill.com'
+  'https://www.accountsybill.com',
+  'https://accountsy-invoice-generator.vercel.app'
 ]
 
 const extraOriginsFromEnv = (envFromFile.ALLOWED_ORIGINS || process.env.ALLOWED_ORIGINS || '')
